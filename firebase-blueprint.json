@@ -1,0 +1,321 @@
+{
+  "entities": {
+    "Store": {
+      "title": "Store",
+      "description": "Pharmacy store profile and configurations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 150 },
+        "address": { "type": "string", "maxLength": 300 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "drugLicenseNo": { "type": "string", "maxLength": 100 },
+        "ownerUid": { "type": "string" },
+        "currency": { "type": "string", "maxLength": 10 },
+        "lowStockThreshold": { "type": "number" },
+        "expiryAlertDays": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "ownerUid"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with store linkage and role-based permissions",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string", "maxLength": 150 },
+        "role": { "type": "string", "enum": ["owner", "manager", "pharmacist", "cashier", "inventory"] },
+        "storeId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "role", "storeId"]
+    },
+    "Medicine": {
+      "title": "Medicine",
+      "description": "Catalog item describing drug details, brand, generic, strength and prices",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "brandName": { "type": "string", "maxLength": 150 },
+        "genericName": { "type": "string", "maxLength": 150 },
+        "banglaName": { "type": "string", "maxLength": 150 },
+        "manufacturer": { "type": "string", "maxLength": 150 },
+        "strength": { "type": "string", "maxLength": 80 },
+        "dosageForm": { "type": "string", "maxLength": 80 },
+        "packUnit": { "type": "string", "maxLength": 50 },
+        "piecesPerPack": { "type": "number" },
+        "purchasePrice": { "type": "number" },
+        "sellingPrice": { "type": "number" },
+        "minStockAlert": { "type": "number" },
+        "barcode": { "type": "string", "maxLength": 100 },
+        "storageNotes": { "type": "string", "maxLength": 300 },
+        "prescriptionRequired": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["active", "archived"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "brandName", "sellingPrice"]
+    },
+    "InventoryBatch": {
+      "title": "InventoryBatch",
+      "description": "Batch tracking for medicines with expiry dates and physical remaining stock",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "medicineId": { "type": "string" },
+        "batchNumber": { "type": "string", "maxLength": 100 },
+        "purchaseDate": { "type": "string" },
+        "expiryDate": { "type": "string" },
+        "quantityReceived": { "type": "number" },
+        "remainingQuantity": { "type": "number" },
+        "purchaseCost": { "type": "number" },
+        "sellingPrice": { "type": "number" },
+        "supplierId": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "quarantined", "expired", "depleted"] },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "medicineId", "batchNumber", "expiryDate", "remainingQuantity"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Point-of-sale customer checkout record with items, discounts, and payments",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "receiptNo": { "type": "string", "maxLength": 60 },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string", "maxLength": 150 },
+        "cashierUid": { "type": "string" },
+        "cashierName": { "type": "string", "maxLength": 150 },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "discount": { "type": "number" },
+        "totalPayable": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "changeAmount": { "type": "number" },
+        "dueAmount": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["cash", "card", "bkash", "nagad", "rocket", "due", "split"] },
+        "status": { "type": "string", "enum": ["completed", "refunded", "cancelled"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "receiptNo", "totalPayable", "paidAmount"]
+    },
+    "Purchase": {
+      "title": "Purchase",
+      "description": "Stock procurement order from medicine supplier",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "invoiceNo": { "type": "string", "maxLength": 100 },
+        "supplierId": { "type": "string" },
+        "supplierName": { "type": "string", "maxLength": 150 },
+        "purchaseDate": { "type": "string" },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "discount": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "payableAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["received", "partial", "returned"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "invoiceNo", "supplierId", "totalAmount"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Pharmaceutical manufacturer or distributor supplier info",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 150 },
+        "company": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "email": { "type": "string", "maxLength": 100 },
+        "address": { "type": "string", "maxLength": 300 },
+        "currentPayable": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "name"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Regular customer profile with dues and purchase history",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "address": { "type": "string", "maxLength": 300 },
+        "totalSpent": { "type": "number" },
+        "currentDue": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "name"]
+    },
+    "CustomerPayment": {
+      "title": "CustomerPayment",
+      "description": "Due collection from customer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "note": { "type": "string", "maxLength": 200 },
+        "collectedBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "customerId", "amount"]
+    },
+    "SupplierPayment": {
+      "title": "SupplierPayment",
+      "description": "Payment issued to supplier for dues",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "supplierId": { "type": "string" },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "note": { "type": "string", "maxLength": 200 },
+        "paidBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "supplierId", "amount"]
+    },
+    "ReturnRecord": {
+      "title": "ReturnRecord",
+      "description": "Returns, damaged stock, quarantine, and write-offs",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "type": { "type": "string", "enum": ["customer_return", "supplier_return", "damaged", "quarantine", "write_off"] },
+        "medicineId": { "type": "string" },
+        "medicineName": { "type": "string" },
+        "batchNumber": { "type": "string" },
+        "quantity": { "type": "number" },
+        "reason": { "type": "string", "maxLength": 300 },
+        "refundAmount": { "type": "number" },
+        "recordedBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "type", "medicineId", "quantity", "reason"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Daily store operating expense",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "title": { "type": "string", "maxLength": 150 },
+        "amount": { "type": "number" },
+        "category": { "type": "string", "enum": ["rent", "electricity", "salary", "transport", "packaging", "other"] },
+        "date": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "note": { "type": "string", "maxLength": 300 },
+        "recordedBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "title", "amount", "category"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Alert for low stock, expiry, and financial reminders",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "type": { "type": "string", "enum": ["low_stock", "expiry_warning", "expired", "due_reminder", "system"] },
+        "title": { "type": "string", "maxLength": 150 },
+        "message": { "type": "string", "maxLength": 500 },
+        "referenceId": { "type": "string" },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "storeId", "type", "title", "isRead"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable security and activity audit records",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "storeId": { "type": "string" },
+        "actorUid": { "type": "string" },
+        "actorName": { "type": "string" },
+        "action": { "type": "string", "maxLength": 100 },
+        "details": { "type": "string", "maxLength": 500 },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "storeId", "actorUid", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/stores/{storeId}": {
+      "schema": "Store",
+      "description": "Pharmacy store registry"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with role and store linkage"
+    },
+    "/medicines/{medicineId}": {
+      "schema": "Medicine",
+      "description": "Medicine catalog items"
+    },
+    "/batches/{batchId}": {
+      "schema": "InventoryBatch",
+      "description": "Inventory batches with expiry and quantity"
+    },
+    "/sales/{saleId}": {
+      "schema": "Sale",
+      "description": "Point-of-sale customer orders"
+    },
+    "/purchases/{purchaseId}": {
+      "schema": "Purchase",
+      "description": "Supplier purchases"
+    },
+    "/suppliers/{supplierId}": {
+      "schema": "Supplier",
+      "description": "Suppliers registry"
+    },
+    "/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Customers registry"
+    },
+    "/customer_payments/{paymentId}": {
+      "schema": "CustomerPayment",
+      "description": "Customer due payments"
+    },
+    "/supplier_payments/{paymentId}": {
+      "schema": "SupplierPayment",
+      "description": "Supplier payments"
+    },
+    "/returns/{returnId}": {
+      "schema": "ReturnRecord",
+      "description": "Returns and damaged stock"
+    },
+    "/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Store expenses"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "In-app notifications and alerts"
+    },
+    "/audit_logs/{auditId}": {
+      "schema": "AuditLog",
+      "description": "Activity audit logs"
+    }
+  }
+}

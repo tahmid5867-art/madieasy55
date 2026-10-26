@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+body {
+  font-family: 'Noto Sans Bengali', 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-receipt, #printable-receipt * {
+    visibility: visible;
+  }
+  #printable-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+  }
+}

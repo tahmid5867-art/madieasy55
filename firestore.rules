@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || resource.data.storeId != null);
+      allow list: if isSignedIn();
+      allow create, update: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Stores collection
+    match /stores/{storeId} {
+      allow get: if isSignedIn() && isValidId(storeId);
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(storeId);
+      allow update: if isSignedIn() && isValidId(storeId);
+    }
+
+    // Medicines collection
+    match /medicines/{medicineId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn() && isValidId(medicineId);
+    }
+
+    // Batches collection
+    match /batches/{batchId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn() && isValidId(batchId);
+    }
+
+    // Sales collection
+    match /sales/{saleId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(saleId);
+    }
+
+    // Purchases collection
+    match /purchases/{purchaseId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(purchaseId);
+    }
+
+    // Suppliers collection
+    match /suppliers/{supplierId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn() && isValidId(supplierId);
+    }
+
+    // Customers collection
+    match /customers/{customerId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn() && isValidId(customerId);
+    }
+
+    // Customer Payments collection
+    match /customer_payments/{paymentId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(paymentId);
+    }
+
+    // Supplier Payments collection
+    match /supplier_payments/{paymentId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(paymentId);
+    }
+
+    // Returns collection
+    match /returns/{returnId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(returnId);
+    }
+
+    // Expenses collection
+    match /expenses/{expenseId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn() && isValidId(expenseId);
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn() && isValidId(notificationId);
+    }
+
+    // Audit logs collection
+    match /audit_logs/{auditId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(auditId);
+      allow update, delete: if false; // Audit logs are immutable
+    }
+
+    // Connectivity test collection
+    match /test/{docId} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}
